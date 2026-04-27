@@ -1,0 +1,61 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check file size (max 10MB)
+    function isValidSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+    
+    // Helper function to check if file is an image
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Helper function to check if file is a document
+    function isDocument() {
+      return request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*') ||
+             request.resource.contentType.matches('application/vnd.ms-excel');
+    }
+    
+    // Avatars - users can upload their own avatar
+    match /avatars/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+                     request.auth.uid == userId && 
+                     isImage() && 
+                     request.resource.size < 5 * 1024 * 1024; // 5MB max for avatars
+    }
+    
+    // Task attachments - assigned users can upload, all can read
+    match /tasks/attachments/{taskId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidSize();
+    }
+    
+    // Message attachments - conversation participants can upload and read
+    match /messages/attachments/{conversationId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidSize();
+    }
+    
+    // Reports - admins and managers can read/write
+    match /reports/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // Vehicle documents - admins can read/write
+    match /vehicles/documents/{vehicleId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isDocument() && isValidSize();
+    }
+  }
+}
