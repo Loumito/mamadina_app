@@ -1,215 +1,133 @@
-# 🍎 Lancer l'Application Mamadina sur iPhone
+# 🍎 Lancer Mamadina sur iPhone / Simulateur iOS
 
-## ✅ Prérequis iOS
+> Le dossier `ios/` est maintenant scaffoldé directement dans le projet (template React Native 0.73.6 personnalisé pour `MamadinaApp`, avec Firebase et permissions GPS/caméra/photos déjà configurés). Plus besoin de créer un projet à part.
 
-Avant de commencer, assurez-vous d'avoir :
+## ✅ Prérequis (sur Mac)
 
-- ✅ **macOS** (obligatoire pour iOS)
-- ✅ **Xcode** installé (depuis l'App Store)
-- ✅ **Command Line Tools** : `xcode-select --install`
-- ✅ **CocoaPods** : `sudo gem install cocoapods` (si pas installé)
-- ✅ **iPhone** connecté en USB avec câble
+- macOS
+- Xcode (App Store) + `xcode-select --install`
+- Node.js ≥ 18 (https://nodejs.org)
+- CocoaPods : `sudo gem install cocoapods`
+- (Optionnel pour appareil physique) iPhone connecté en USB + câble
 
-## 🚀 Installation en 1 Commande
-
-Ouvrez le Terminal et exécutez :
+## 🚀 Installation en 1 commande
 
 ```bash
 cd /Users/lounessadmi/Documents/mamadina_app
 ./setup-ios.sh
 ```
 
-**Durée : ~10-15 minutes** (installation des pods iOS prend du temps)
+Le script :
 
-## 📱 Lancer sur votre iPhone
+1. vérifie Node, Xcode, CocoaPods
+2. lance `npm install --legacy-peer-deps` (~3-5 min)
+3. lance `pod install --repo-update` dans `ios/` (~5-10 min)
+4. signale si `GoogleService-Info.plist` ou `google-services.json` manquent
 
-### Méthode 1 : Via Xcode (Recommandé pour la 1ère fois)
+## 🔥 Configurer Firebase (avant le 1er lancement)
+
+L'app utilise `@react-native-firebase`. Il faut **deux fichiers** Firebase :
+
+### iOS — `GoogleService-Info.plist`
+
+1. https://console.firebase.google.com → votre projet → ⚙️ Paramètres du projet → Vos apps → ajouter une **app iOS** avec bundle id `com.mamadinaapp` (ou modifiez le bundle id dans Xcode si vous préférez).
+2. Téléchargez `GoogleService-Info.plist`.
+3. Ouvrez `ios/MamadinaApp.xcworkspace` dans Xcode.
+4. Glissez le fichier dans le dossier `MamadinaApp` (à côté de `Info.plist`), cochez **Copy items if needed** et la target **MamadinaApp**.
+
+### Android — `google-services.json`
+
+1. Même console → ajouter une **app Android** avec package `com.mamadinaapp`.
+2. Téléchargez `google-services.json` et placez-le dans `android/app/`.
+3. Décommentez dans `android/build.gradle` la ligne `classpath("com.google.gms:google-services:4.4.0")` et ajoutez `apply plugin: 'com.google.gms.google-services'` à la fin de `android/app/build.gradle`.
+
+> **Sans ces fichiers, l'app crashera au démarrage** car `firebaseAuth = auth()` est appelé dans `src/api/firebase.ts`. Pour tester l'UI sans Firebase, voir « Mode test sans Firebase » plus bas.
+
+## 📱 Lancer l'app
+
+### Méthode 1 — Xcode (recommandé pour la 1ère fois sur iPhone)
 
 ```bash
-cd /Users/lounessadmi/Documents/MamadinaApp
 open ios/MamadinaApp.xcworkspace
 ```
 
 Dans Xcode :
-1. Sélectionnez votre iPhone dans la liste des appareils en haut
-2. Cliquez sur le bouton **Play** (▶️)
-3. La première fois, allez dans **Réglages iPhone** > **Général** > **Gestion des appareils** > **Faire confiance au développeur**
 
-### Méthode 2 : Via Terminal (Après la 1ère fois)
+1. Sélectionner la cible **MamadinaApp** + votre iPhone (ou un simulateur)
+2. **Signing & Capabilities** → cocher *Automatically manage signing* → choisir votre **Team** (Apple ID gratuit OK)
+3. ▶️ **Play**
+
+### Méthode 2 — Terminal (après le 1er build réussi)
 
 ```bash
-cd /Users/lounessadmi/Documents/MamadinaApp
-
-# Terminal 1 - Metro Bundler
+# Terminal 1
 npm start
 
-# Terminal 2 - Lancer l'app
-npm run ios
-# Ou spécifier votre iPhone :
-npm run ios -- --device "iPhone de Lounès"
+# Terminal 2 (laissez Metro tourner)
+npm run ios                            # simulateur par défaut
+npm run ios -- --simulator "iPhone 15" # autre simulateur
+npm run ios -- --device                # iPhone connecté en USB
 ```
 
-## 🔧 Configurer votre iPhone
+## 🧪 Mode test sans Firebase
 
-### 1. Activer le Mode Développeur
+Pour vérifier rapidement que l'UI compile sans configurer Firebase :
 
-Sur iOS 16+ :
-- **Réglages** > **Confidentialité et sécurité** > **Mode développeur** > **Activer**
-- Redémarrer l'iPhone
+`index.js` → remplacez `import App from './App';` par `import App from './AppSimple';`
 
-### 2. Faire Confiance à votre Mac
+`AppSimple.tsx` court-circuite l'auth et affiche directement l'interface Admin. **Pensez à remettre `./App` quand vous configurez Firebase.**
 
-Quand vous connectez l'iPhone :
-- Un message apparaît sur l'iPhone : **"Faire confiance à cet ordinateur ?"**
-- Appuyez sur **Faire confiance**
-- Entrez le code de l'iPhone
+## 📍 Permissions iOS déjà configurées
 
-### 3. Code Signing (Première fois dans Xcode)
+`ios/MamadinaApp/Info.plist` contient :
 
-Dans Xcode :
-1. Sélectionnez le projet **MamadinaApp** dans la sidebar
-2. Onglet **Signing & Capabilities**
-3. Cochez **Automatically manage signing**
-4. Sélectionnez votre **Team** (votre Apple ID)
-5. Xcode créera automatiquement le profil de provisioning
+- `NSLocationWhenInUseUsageDescription`, `NSLocationAlwaysAndWhenInUseUsageDescription`, `NSLocationAlwaysUsageDescription` (GPS pointage + suivi flotte + arrière-plan)
+- `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`, `NSPhotoLibraryAddUsageDescription` (pièces jointes tâches/messages)
+- `NSMicrophoneUsageDescription` (messages vocaux futurs)
+- `UIBackgroundModes` : `location`, `fetch`, `remote-notification`
 
-## 🎯 Deux Modes de Test
+Modifiez les textes en français comme bon vous semble — Apple les rejette s'ils sont vides ou génériques.
 
-### Mode Simple (sans Firebase)
+## 🐛 Dépannage
 
-Dans `MamadinaApp/index.js`, changez :
-```javascript
-import App from './App';
-```
+| Symptôme | Solution |
+|---|---|
+| `pod install` échoue avec « Module 'Firebase' not found » | Le `Podfile` est déjà configuré (`use_frameworks! :static` + `$RNFirebaseAsStaticFramework = true`). Si le souci persiste : `cd ios && pod deintegrate && pod install --repo-update` |
+| `App.app crashed at launch` (Firebase) | `GoogleService-Info.plist` manquant ou bundle id incorrect |
+| `Unable to boot device` | Débrancher/rebrancher iPhone, redémarrer, puis Xcode → Product → Clean Build Folder |
+| `App not trusted` (sur iPhone) | Réglages → Général → VPN et gestion → Faire confiance à [votre dev] |
+| Metro ne se connecte pas | iPhone et Mac sur le **même WiFi**, ou USB uniquement |
+| Cache bizarre | `npm start -- --reset-cache && cd ios && rm -rf build Pods && pod install` |
+| `EXCLUDED_ARCHS` simulateur Apple Silicon | Le `Podfile` ne l'exclut que sur Intel. Sur M1/M2/M3 c'est ignoré, OK. |
 
-En :
-```javascript
-import App from './AppSimple';
-```
+## 📊 Logs
 
-Vous verrez directement l'interface Admin ! ✨
-
-### Mode Complet (avec Firebase)
-
-1. Suivez SETUP.md pour configurer Firebase
-2. Téléchargez `GoogleService-Info.plist`
-3. Glissez-le dans Xcode dans le dossier `MamadinaApp`
-4. Cochez "Copy items if needed"
-5. Lancez l'app
-
-## 🐛 Problèmes Courants iOS
-
-### "No signing certificate"
-
-**Solution :**
-1. Ouvrir Xcode
-2. **Preferences** > **Accounts**
-3. Ajouter votre Apple ID
-4. **Download Manual Profiles**
-
-### "Pod install failed"
-
-**Solution :**
 ```bash
-cd /Users/lounessadmi/Documents/MamadinaApp/ios
-pod deintegrate
-pod install
+npx react-native log-ios                 # JS logs
+log stream --predicate 'process == "MamadinaApp"'  # logs natifs
 ```
 
-### "Unable to boot device"
+Dans Xcode : la console en bas affiche tout.
 
-**Solution :**
-1. Déconnectez/reconnectez l'iPhone
-2. Redémarrez l'iPhone
-3. Dans Xcode : **Product** > **Clean Build Folder**
+## 🔍 Debug
 
-### "App not trusted"
+- Simulateur : `Cmd+D` → ouvrir le menu dev → Debug
+- iPhone : secouer l'appareil → menu dev
 
-**Solution :**
-Sur l'iPhone :
-- **Réglages** > **Général** > **Gestion des appareils**
-- Appuyez sur votre email
-- **Faire confiance à [Votre Nom]**
+## ✅ Checklist 1er lancement
 
-### Metro Bundler ne se connecte pas
+- [ ] `./setup-ios.sh` s'est terminé sans erreur
+- [ ] `GoogleService-Info.plist` glissé dans Xcode (target MamadinaApp cochée)
+- [ ] Bundle id Firebase = bundle id Xcode
+- [ ] Build réussi dans Xcode (▶️)
+- [ ] L'écran de connexion s'affiche (ou l'interface Admin en mode `AppSimple`)
 
-**Solution :**
-- iPhone et Mac doivent être sur le **même WiFi**
-- Ou désactivez le WiFi et utilisez uniquement l'USB
+## 📚 Doc
 
-### L'app crash au démarrage
-
-**Solution :**
-```bash
-npm start -- --reset-cache
-cd ios
-rm -rf build
-xcodebuild clean -workspace MamadinaApp.xcworkspace -scheme MamadinaApp
-cd ..
-npm run ios
-```
-
-## 📊 Voir les Logs
-
-**Dans Xcode :**
-- En bas : Console (affiche les logs React Native)
-
-**Dans Terminal :**
-```bash
-# Voir les logs React Native
-npx react-native log-ios
-
-# Voir tous les logs système
-log stream --predicate 'process == "MamadinaApp"'
-```
-
-## 🔍 Déboguer
-
-### React Native Debugger
-
-1. Secouez votre iPhone (ou Cmd+D dans simulateur)
-2. **Debug** > **Open Debugger**
-3. Une page Chrome s'ouvre
-
-### Inspect Element
-
-1. Secouez l'iPhone
-2. **Show Inspector**
-3. Touchez les éléments pour voir leurs propriétés
-
-## 📝 Notes Importantes
-
-- ⚠️ **Certificat de développeur** : Gratuit avec un Apple ID, mais limité à 3 appareils
-- ⚠️ **Rebuild** : Après chaque `pod install`, rebuild dans Xcode
-- ⚠️ **Cache** : Si problèmes étranges, nettoyez le cache (`npm start -- --reset-cache`)
-- ⚠️ **Premier lancement** : Prend 2-3 minutes (compilation + installation)
-
-## ✅ Checklist de Test
-
-Après le lancement, vérifiez :
-
-- [ ] L'app se lance sans crash
-- [ ] L'écran de connexion (ou Admin) s'affiche
-- [ ] Les onglets de navigation fonctionnent
-- [ ] Pas d'erreurs dans la console Metro
-- [ ] L'app reste ouverte sans crash
-
-## 🎉 Vous êtes Prêt !
-
-Une fois que l'app tourne sur votre iPhone :
-
-1. Testez la navigation entre les onglets
-2. Si mode Simple : voyez l'interface Admin
-3. Si mode Firebase : testez la connexion
-4. Développez les écrans selon vos besoins
-
-## 📚 Documentation
-
-- **QUICKSTART.md** - Guide général
-- **SETUP.md** - Configuration Firebase
-- **ARCHITECTURE.md** - Architecture détaillée
-- **README.md** - Vue d'ensemble
+- `README.md` — vue d'ensemble
+- `SETUP.md` — Firebase détaillé
+- `ARCHITECTURE.md` — modules et flux
 
 ---
 
-**Bon développement sur iOS ! 🍎📱**
+Bonne build ! 🍎

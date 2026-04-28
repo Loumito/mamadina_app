@@ -1,0 +1,69 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+# react-native-firebase needs static frameworks. The line below enables them
+# and is the officially recommended setup. Flipper is incompatible with static
+# frameworks so it is disabled.
+use_frameworks! :linkage => :static
+$RNFirebaseAsStaticFramework = true
+
+# Flipper does not work with use_frameworks!, so always disable it here.
+flipper_config = FlipperConfiguration.disabled
+
+target 'MamadinaApp' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :fabric_enabled => false,
+    :flipper_configuration => flipper_config,
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  # react-native-maps needs Google Maps to be linked explicitly.
+  # Uncomment if you decide to use the Google Maps provider on iOS:
+  # pod 'GoogleMaps'
+  # pod 'Google-Maps-iOS-Utils'
+
+  target 'MamadinaAppTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+
+    # Set deployment target to 13.4 on every pod target so Firebase compiles cleanly.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64' unless `uname -m`.strip == 'arm64'
+      end
+
+      # Fix BoringSSL-GRPC build error on Apple Silicon simulators with recent Xcode:
+      # the per-file COMPILER_FLAGS list contains "-GCC_WARN_INHIBIT_ALL_WARNINGS"
+      # which clang parses as an unsupported "-G" option. Strip it.
+      if target.name == 'BoringSSL-GRPC'
+        target.source_build_phase.files.each do |file|
+          if file.settings && file.settings['COMPILER_FLAGS']
+            flags = file.settings['COMPILER_FLAGS'].split
+            flags.reject! { |flag| flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
+            file.settings['COMPILER_FLAGS'] = flags.join(' ')
+          end
+        end
+      end
+    end
+  end
+end

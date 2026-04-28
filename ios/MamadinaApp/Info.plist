@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>fr</string>
+	<key>CFBundleDisplayName</key>
+	<string>Mamadina</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+
+	<!-- Permissions GPS / Localisation (suivi de flotte, pointage, geofencing) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Mamadina utilise votre position pour le pointage GPS et le suivi des trajets.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Mamadina suit votre position en arriere-plan pour les chauffeurs en service afin d enregistrer les trajets.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Mamadina suit votre position en arriere-plan pour les chauffeurs en service afin d enregistrer les trajets.</string>
+
+	<!-- Permissions appareil photo / photothèque (pièces jointes de taches, profils) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Mamadina utilise l appareil photo pour ajouter des pieces jointes aux taches et messages.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Mamadina accede a vos photos pour les ajouter aux taches et conversations.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Mamadina enregistre des images dans votre phototheque.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Mamadina peut enregistrer des messages vocaux pour la messagerie interne.</string>
+
+	<!-- Notifications et arriere-plan -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
+
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>fr</string>
+		<string>ar</string>
+	</array>
+</dict>
+</plist>
