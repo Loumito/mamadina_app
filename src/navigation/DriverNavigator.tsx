@@ -1,79 +1,43 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {View, Text, StyleSheet} from 'react-native';
 import {COLORS} from '../constants';
+import {tabIcon} from '../components/ui';
+import {TripsScreen} from '../screens/driver/TripsScreen';
+import {MapScreen} from '../screens/driver/MapScreen';
+import {MessagesScreen} from '../screens/shared/MessagesScreen';
+import {ProfileScreen} from '../screens/shared/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
-
-// Placeholder screens
-const TripsScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Mes Trajets</Text>
-  </View>
-);
-
-const MapScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Carte GPS</Text>
-  </View>
-);
-
-const MessagesScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Messages</Text>
-  </View>
-);
-
-const ProfileScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Mon Profil</Text>
-  </View>
-);
 
 export const DriverNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
-        headerStyle: {
-          backgroundColor: COLORS.primary,
-        },
-        headerTintColor: COLORS.textOnPrimary,
+        tabBarStyle: {height: 60, paddingBottom: 8, paddingTop: 6},
       }}>
       <Tab.Screen
         name="Trips"
         component={TripsScreen}
-        options={{title: 'Mes trajets'}}
+        options={{title: 'Trajets', tabBarIcon: tabIcon('🛣️')}}
       />
       <Tab.Screen
         name="Map"
         component={MapScreen}
-        options={{title: 'Carte'}}
+        options={{title: 'Carte', tabBarIcon: tabIcon('🗺️')}}
       />
       <Tab.Screen
         name="Messages"
         component={MessagesScreen}
-        options={{title: 'Messages'}}
+        options={{title: 'Messages', tabBarIcon: tabIcon('💬')}}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{title: 'Profil'}}
+        options={{title: 'Profil', tabBarIcon: tabIcon('👤')}}
       />
     </Tab.Navigator>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  text: {
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-});

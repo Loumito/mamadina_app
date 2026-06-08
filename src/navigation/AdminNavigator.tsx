@@ -1,90 +1,55 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {View, Text, StyleSheet} from 'react-native';
 import {COLORS} from '../constants';
+import {tabIcon} from '../components/ui';
+import {DashboardScreen} from '../screens/admin/DashboardScreen';
+import {UsersScreen} from '../screens/admin/UsersScreen';
+import {TasksScreen} from '../screens/admin/TasksScreen';
+import {FleetScreen} from '../screens/admin/FleetScreen';
+import {ReportsScreen} from '../screens/shared/ReportsScreen';
+import {SettingsScreen} from '../screens/admin/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
-
-// Placeholder screens
-const DashboardScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Dashboard Administrateur</Text>
-  </View>
-);
-
-const UsersScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Gestion des Utilisateurs</Text>
-  </View>
-);
-
-const TasksScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Gestion des Tâches</Text>
-  </View>
-);
-
-const FleetScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Gestion de la Flotte</Text>
-  </View>
-);
-
-const SettingsScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Paramètres</Text>
-  </View>
-);
 
 export const AdminNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
-        headerStyle: {
-          backgroundColor: COLORS.primary,
-        },
-        headerTintColor: COLORS.textOnPrimary,
+        tabBarStyle: {height: 60, paddingBottom: 8, paddingTop: 6},
       }}>
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{title: 'Tableau de bord'}}
+        options={{title: 'Accueil', tabBarIcon: tabIcon('📊')}}
       />
       <Tab.Screen
         name="Users"
         component={UsersScreen}
-        options={{title: 'Utilisateurs'}}
+        options={{title: 'Utilisateurs', tabBarIcon: tabIcon('👥')}}
       />
       <Tab.Screen
         name="Tasks"
         component={TasksScreen}
-        options={{title: 'Tâches'}}
+        options={{title: 'Tâches', tabBarIcon: tabIcon('📋')}}
       />
       <Tab.Screen
         name="Fleet"
         component={FleetScreen}
-        options={{title: 'Flotte'}}
+        options={{title: 'Flotte', tabBarIcon: tabIcon('🚚')}}
+      />
+      <Tab.Screen
+        name="Reports"
+        component={ReportsScreen}
+        options={{title: 'Rapports', tabBarIcon: tabIcon('📈')}}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{title: 'Paramètres'}}
+        options={{title: 'Paramètres', tabBarIcon: tabIcon('⚙️')}}
       />
     </Tab.Navigator>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  text: {
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-});

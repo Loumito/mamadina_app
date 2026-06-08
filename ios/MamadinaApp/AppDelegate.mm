@@ -7,8 +7,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  // Initialize Firebase. Requires GoogleService-Info.plist in the Xcode project.
-  if ([FIRApp defaultApp] == nil) {
+  // Initialize Firebase only if GoogleService-Info.plist is bundled.
+  // Lets the app launch in "demo" mode (e.g. AppSimple) without Firebase configured.
+  NSString *firebasePlist = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
+  if (firebasePlist != nil && [FIRApp defaultApp] == nil) {
     [FIRApp configure];
   }
 
