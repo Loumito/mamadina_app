@@ -1,90 +1,49 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {View, Text, StyleSheet} from 'react-native';
 import {COLORS} from '../constants';
+import {tabIcon} from '../components/ui';
+import {DashboardScreen} from '../screens/manager/DashboardScreen';
+import {TasksScreen} from '../screens/manager/TasksScreen';
+import {TeamScreen} from '../screens/manager/TeamScreen';
+import {ReportsScreen} from '../screens/shared/ReportsScreen';
+import {MessagesScreen} from '../screens/shared/MessagesScreen';
 
 const Tab = createBottomTabNavigator();
-
-// Placeholder screens
-const DashboardScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Dashboard Responsable</Text>
-  </View>
-);
-
-const TasksScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Gestion des Tâches</Text>
-  </View>
-);
-
-const TeamScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Mon Équipe</Text>
-  </View>
-);
-
-const MessagesScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Messages</Text>
-  </View>
-);
-
-const ReportsScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>Rapports</Text>
-  </View>
-);
 
 export const ManagerNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
-        headerStyle: {
-          backgroundColor: COLORS.primary,
-        },
-        headerTintColor: COLORS.textOnPrimary,
+        tabBarStyle: {height: 60, paddingBottom: 8, paddingTop: 6},
       }}>
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{title: 'Tableau de bord'}}
+        options={{title: 'Accueil', tabBarIcon: tabIcon('📊')}}
       />
       <Tab.Screen
         name="Tasks"
         component={TasksScreen}
-        options={{title: 'Tâches'}}
+        options={{title: 'Tâches', tabBarIcon: tabIcon('📋')}}
       />
       <Tab.Screen
         name="Team"
         component={TeamScreen}
-        options={{title: 'Équipe'}}
-      />
-      <Tab.Screen
-        name="Messages"
-        component={MessagesScreen}
-        options={{title: 'Messages'}}
+        options={{title: 'Équipe', tabBarIcon: tabIcon('👥')}}
       />
       <Tab.Screen
         name="Reports"
         component={ReportsScreen}
-        options={{title: 'Rapports'}}
+        options={{title: 'Rapports', tabBarIcon: tabIcon('📈')}}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={{title: 'Messages', tabBarIcon: tabIcon('💬')}}
       />
     </Tab.Navigator>
   );
 };
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  text: {
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-});
